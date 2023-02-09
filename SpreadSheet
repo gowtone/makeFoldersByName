@@ -1,0 +1,31 @@
+const sheet = SpreadsheetApp.getActiveSheet();
+
+/**
+ * フォルダ名を指定して、フォルダを作成する関数
+ */
+function makeFoldersByName() {
+  if (sheet.getRange(13, 1).getValue() === '') {
+    return Browser.msgBox('フォルダ名を最低一つは入力してください。')
+  }
+
+  const folder_num = sheet.getRange(12, 1).getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow()-12;
+  const folder_list = sheet.getRange(13, 1, folder_num, 1).getValues();
+
+  const folder_id = sheet.getRange(9, 1).getValue();
+  if (folder_id === ''){
+    return Browser.msgBox('フォルダのIDを入力してください');
+  }
+
+  // フォルダIDからフォルダを取得
+  let target_folder;
+  try {
+    target_folder = DriveApp.getFolderById(folder_id);
+  } catch (error) {
+    return Browser.msgBox('フォルダのURLが間違っています。')
+  }
+
+  // 指定したフォルダ内に、グループごとのフォルダを作成。
+  folder_list.forEach(folder_name => {
+    target_folder.createFolder(folder_name[0]);
+  })
+}
